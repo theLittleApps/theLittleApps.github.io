@@ -239,11 +239,13 @@
   margin-left: 0;
 }
 
+/* 調整程式碼 highlight 用 */
 .post-content code,
 .post-content pre {
-  font-family: JetBrains Mono, SFMono-Regular, Consolas, Liberation Mono, Menlo,
+  /* font-family: JetBrains Mono, SFMono-Regular, Consolas, Liberation Mono, Menlo, */
+  font-family: Menlo, JetBrains Mono, SFMono-Regular, Consolas, Liberation Mono,
     Courier, monospace;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .post-content input::-webkit-inner-spin-button,
