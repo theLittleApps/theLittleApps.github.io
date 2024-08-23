@@ -38,14 +38,15 @@
   letter-spacing: 1px;
 }
 
+/* 調整 markdown 的 header 用 */
 .post-content h1::before,
 .post-content h2::before,
 .post-content h3::before,
 .post-content h4::before,
 .post-content h5::before,
 .post-content h6::before {
-  content: "⌗";
-  padding-right: 10px;
+  content: "";
+  padding-right: 0px;
   color: var(--color-hashtag);
   font-weight: 600;
 }
