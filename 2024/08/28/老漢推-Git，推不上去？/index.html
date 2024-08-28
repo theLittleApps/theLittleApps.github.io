@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <title>
+    
+    老漢推 Git，推不上去？ 丨
+    
+
+    thelittleapps
+  </title>
+
+  
+  <link rel="shortcut icon" href="/logo.svg">
+  
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  
+  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.css">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+  
+
+  <!-- 字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+  
+<link rel="stylesheet" href="/css/root.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/css/post.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <header class="header">
+  <section class="header-container">
+    <a class="logo" href="/">The Little Apps</a>
+    <ul class="nav">
+      
+      <li><a href="/archives">blogs</a></li>
+      
+      <li><a href="/about">about</a></li>
+      
+    </ul>
+  </section>
+</header>
+  <main class="main">
+    <article class="post">
+  
+  <div class="post-title">老漢推 Git，推不上去？</div>
+  <div class="post-meta">
+    <div class="date">2024 August 28th</div>
+    <div class="tags">
+      
+    </div>
+  </div>
+  
+
+  <main class="post-content"><p>身為一位開發者大叔，<strong>GitHub</strong> 真是大叔的 D 槽啊！上面有諸多的<strong>小三元件</strong> ( 第三方程式庫 ) 可以盡情享用，重點還是免費，現在 GitHub 也允許大叔上傳私人的珍藏 ( private repositories )，但有時就會發生推不上去的窘境，就像：</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/01_github_does_not_support_https_push.webp" alt="01_github_does_not_support_https_push"></p>
+<p>錯誤碼 <strong>403</strong> 通常是代表權限不足，要怎麼解決老漢推不上 GitHub 的問題呢？很簡單登入 GitHub 帳號，在&#x3D;&#x3D;設定 &#x2F; 開發者設定 ( Settings &#x2F; Developer Settings )&#x3D;&#x3D; 下去產生一組 <strong>Personal Access Token</strong> :</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/02_go_to_github_setting_generate_token.webp" alt="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/02_go_to_github_setting_generate_token.webp"></p>
+<p>在產生 token 的頁面，可以勾選這幾個參數 ( 我們只需要有推入 <strong>repo</strong> 的權限即可！)，而 token 的有效期限 ( Expiration )，可以自行決定要設多久，大叔在這設定<strong>沒有期限</strong> ( No expiration )</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/03_generate_personal_access_token_for_repo.webp" alt="03_generate_personal_access_token_for_repo"></p>
+<p>設定完後就可以產出一組 token，把它下載回來或拷貝起來，好好保存，只有這一次的機會可以下載，如果忘了 token 是什麼，請再重新產生一組新的 token。</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/04_token_generated.webp" alt="04_token_generated"></p>
+<p>得到 <strong>access token</strong> 後，在 <strong>終端機 ( console )</strong> 先鍵入 <code>git remote remove orign</code> 先刪除舊有的遠端 <strong>ropo url</strong>，再重新加入<strong>加上 token 的 url</strong> 如: <code>git remote add origin https://[access token]@github.com/[GitHub 帳號名稱]/[遠端分支名稱 (branch name)]</code></p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/05_add_token_in_front_push_url.webp" alt="05_add_token_in_front_push_url"></p>
+<p>然後再<strong>推 ( git push)</strong> 一次，就成功啦！</p>
+<p>這樣只有電腦 D 槽中一有什麼變動，記得要馬上就推到遠端 GitHub 去，這樣不論要單獨享樂還時與大家共享，就都沒問題啦！</p>
+<h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><p>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://brucehsu-developer.medium.com/%E8%BD%89%E6%8F%9B%E4%BD%BF%E7%94%A8-personal-access-token-%E6%9B%B4%E5%AE%89%E5%85%A8%E7%9A%84%E6%93%8D%E4%BD%9C-github-86deee62bd52">轉換使用 Personal Access Token 更安全的操作 GitHub</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/16330404/how-to-remove-remote-origin-from-a-git-repository?utm_source=pocket_shared">How to remove remote origin from a Git repository</a></p>
+<h3 id="贊助我們"><a href="#贊助我們" class="headerlink" title="贊助我們"></a>贊助我們</h3><p><a href="https://www.buymeacoffee.com/thelittleapps" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a></p>
+</main>
+</article>
+<div>
+  <section id="comments" class="comments">
+    <style>
+      .utterances{max-width: 100%;}
+    </style>
+    <script src="https://utteranc.es/client.js"
+      repo="theLittleApps/theLittleApps.github.io"
+      issue-term="url"
+      theme="preferred-color-scheme"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+</div>
+
+<script src="/js/highlight.js"></script>
+
+  </main>
+  <footer class="footer">
+  
+  <span>Copyright © 2024 The Little Apps</span>
+  
+</footer>
+  
+<script src="/js/theme.js"></script>
+
+</body>
+
+</html>
