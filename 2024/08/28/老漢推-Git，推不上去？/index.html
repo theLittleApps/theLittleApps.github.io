@@ -65,7 +65,7 @@
 
   <main class="post-content"><p>身為一位開發者大叔，<strong>GitHub</strong> 真是大叔的 D 槽啊！上面有諸多的<strong>小三元件</strong> ( 第三方程式庫 ) 可以盡情享用，重點還是免費，現在 GitHub 也允許大叔上傳私人的珍藏 ( private repositories )，但有時就會發生推不上去的窘境，就像：</p>
 <p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/01_github_does_not_support_https_push.webp" alt="01_github_does_not_support_https_push"></p>
-<p>錯誤碼 <strong>403</strong> 通常是代表權限不足，要怎麼解決老漢推不上 GitHub 的問題呢？很簡單登入 GitHub 帳號，在&#x3D;&#x3D;設定 &#x2F; 開發者設定 ( Settings &#x2F; Developer Settings )&#x3D;&#x3D; 下去產生一組 <strong>Personal Access Token</strong> :</p>
+<p>錯誤碼 <strong>403</strong> 通常是代表權限不足，要怎麼解決老漢推不上 GitHub 的問題呢？很簡單登入 GitHub 帳號，在<strong>設定 &#x2F; 開發者設定 ( Settings &#x2F; Developer Settings )</strong> 下去產生一組 <strong>Personal Access Token</strong> :</p>
 <p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/02_go_to_github_setting_generate_token.webp" alt="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/02_go_to_github_setting_generate_token.webp"></p>
 <p>在產生 token 的頁面，可以勾選這幾個參數 ( 我們只需要有推入 <strong>repo</strong> 的權限即可！)，而 token 的有效期限 ( Expiration )，可以自行決定要設多久，大叔在這設定<strong>沒有期限</strong> ( No expiration )</p>
 <p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/gitcannotpush/03_generate_personal_access_token_for_repo.webp" alt="03_generate_personal_access_token_for_repo"></p>
