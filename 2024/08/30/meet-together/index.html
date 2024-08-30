@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <title>
+    
+    相遇的一刻，當 Objective-C 遇到了 SwiftUI 丨
+    
+
+    thelittleapps
+  </title>
+
+  
+  <link rel="shortcut icon" href="/logo.svg">
+  
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  
+  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.css">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+  
+
+  <!-- 字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+  
+<link rel="stylesheet" href="/css/root.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/css/post.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <header class="header">
+  <section class="header-container">
+    <a class="logo" href="/">The Little Apps</a>
+    <ul class="nav">
+      
+      <li><a href="/archives">blogs</a></li>
+      
+      <li><a href="/about">about</a></li>
+      
+    </ul>
+  </section>
+</header>
+  <main class="main">
+    <article class="post">
+  
+  <div class="post-title">相遇的一刻，當 Objective-C 遇到了 SwiftUI</div>
+  <div class="post-meta">
+    <div class="date">2024 August 30th</div>
+    <div class="tags">
+      
+    </div>
+  </div>
+  
+
+  <main class="post-content"><p>雖然 <strong>SwiftUI</strong> 已經問世五年了 (<a target="_blank" rel="noopener" href="https://developer.apple.com/wwdc19/204">WWDC2019</a>)，但實務上寫 iOS 的碼農，大都還在維護 <strong>Objective-C</strong> 撰寫的專案吧！尤其是陳年老 code，不像是美酒一樣越陳越香，反而是越陳越覺得難以吞嚥，幻想如果有一天全都變成漂亮的靚女 (<strong>Swift</strong>) ，而且全都用 <strong>SwiftUI</strong> 來化妝，那該有多好啊！</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/meetTogether/01_objectiiveC_meet_swiftUI.webp" alt="01_objectiiveC_meet_swiftUI"></p>
+<p>蘋果教主聽到大叔們心裡的呼喊，派了 <strong><code>UIHostingController</code></strong> 仙女下凡，來滿足一眾死肥宅們的春夢，在龍鐘老 code 中，嵌入 SwiftUI 這位纖纖美少女。</p>
+<h2 id="STEP1-先來產生-SwiftUI"><a href="#STEP1-先來產生-SwiftUI" class="headerlink" title="STEP1 先來產生 SwiftUI"></a>STEP1 先來產生 SwiftUI</h2><p>在 <strong>Objective-C</strong> 的專案中 <strong>New File</strong>，大膽的選擇 <strong>SwiftUI View</strong></p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/meetTogether/02_create_swiftui.webp" alt="02_create_swiftui"></p>
+<p>貼心的 <strong>Xcode</strong>，會詢問您要不要產生一個 <strong>Bridging Header</strong> 的標頭檔 ( 如果專案沒產生過，你也可在專案設定中自行設定它的名字 )，這個檔主要是拿來做 <strong>Objective-C</strong> 與 <strong>Swift</strong> 溝通的橋樑，在這 <strong>.h</strong> 中 <strong>import</strong> <strong>Objective-C</strong> 寫的 <strong>.h</strong>，就可以在 <strong>Swift</strong> 中，呼叫 <strong>OC ( Objective-C )</strong> 寫的函式 (function)。</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/meetTogether/03_generate_bridge_file.webp" alt="03_generate_bridge_file"></p>
+<p>如下的 <strong>SwiftUI</strong></p>
+<pre><code class="highlight stylus">import SwiftUI
+
+struct HelloView: View &#123;
+    <span class="selector-tag">var</span> <span class="selector-tag">body</span>: some View &#123;
+        ZStack &#123;
+            Color<span class="selector-class">.blue</span><span class="selector-class">.opacity</span>(<span class="number">0.6</span>)
+                <span class="selector-class">.ignoresSafeArea</span>()
+            <span class="built_in">Text</span>(<span class="string">&quot;Hello, Objective-C&quot;</span>)
+                <span class="selector-class">.font</span>(.title)
+                <span class="selector-class">.foregroundStyle</span>(.white)
+        &#125;
+    &#125;
+&#125;
+
+<span class="selector-id">#Preview</span> &#123;
+    <span class="built_in">HelloView</span>()
+&#125;
+</code></pre>
+
+<p>寫 SwiftUI 的好處，就是在畫面右邊可以即時見到 UI 的渲染，不用像盲劍客一樣，全靠想像來寫 code 畫 UI 了。</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/meetTogether/04_program_in_SwiftUI.webp" alt="04_program_in_SwiftUI"></p>
+<h2 id="STEP2-再來產生一-View-Controller-UIKit"><a href="#STEP2-再來產生一-View-Controller-UIKit" class="headerlink" title="STEP2 再來產生一 View Controller ( UIKit )"></a>STEP2 再來產生一 View Controller ( UIKit )</h2><p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/meetTogether/05_select_cocoa_touch.webp" alt="05_select_cocoa_touch"></p>
+<p>選擇由 <strong>UIViewController</strong> 繼承，語言 <strong>Swift</strong></p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/meetTogether/06_generate_uiviewctr.webp" alt="06_generate_uiviewctr"></p>
+<p>如下 Swift</p>
+<pre><code class="highlight stylus">import UIKit
+import SwiftUI
+
+class HelloViewController: UIViewController &#123;
+
+    override func <span class="built_in">viewDidLoad</span>() &#123;
+        super<span class="selector-class">.viewDidLoad</span>()
+        
+        let helloView = <span class="built_in">HelloView</span>()
+        <span class="comment">// the key:UIHostingController is the bridge between UIKit and SwiftUI</span>
+        let hostCtr = <span class="built_in">UIHostingController</span>(rootView: helloView)
+        
+        <span class="comment">// add this hosting controller to our view controller</span>
+        <span class="built_in">addChild</span>(hostCtr)
+        view<span class="selector-class">.addSubview</span>(hostCtr.view)
+        
+        <span class="comment">// set auto layout constraints of hosting controller</span>
+        hostCtr<span class="selector-class">.view</span><span class="selector-class">.translatesAutoresizingMaskIntoConstraints</span> = false
+        hostCtr<span class="selector-class">.view</span><span class="selector-class">.topAnchor</span><span class="selector-class">.constraint</span>(equalTo: view<span class="selector-class">.topAnchor</span>, constant: <span class="number">0</span>)<span class="selector-class">.isActive</span> = true
+        hostCtr<span class="selector-class">.view</span><span class="selector-class">.bottomAnchor</span><span class="selector-class">.constraint</span>(equalTo: view<span class="selector-class">.bottomAnchor</span>, constant: <span class="number">0</span>)<span class="selector-class">.isActive</span> = true
+        hostCtr<span class="selector-class">.view</span><span class="selector-class">.leadingAnchor</span><span class="selector-class">.constraint</span>(equalTo: view<span class="selector-class">.leadingAnchor</span>, constant: <span class="number">0</span>)<span class="selector-class">.isActive</span> = true
+        hostCtr<span class="selector-class">.view</span><span class="selector-class">.trailingAnchor</span><span class="selector-class">.constraint</span>(equalTo: view<span class="selector-class">.trailingAnchor</span>, constant: <span class="number">0</span>)<span class="selector-class">.isActive</span> = true
+        
+        <span class="comment">// notify hosting controller that has been added to parent view controller</span>
+        hostCtr<span class="selector-class">.didMove</span>(toParent: self)
+    &#125;
+&#125;</code></pre>
+
+<p>這 view controller 的目的，就是作為 <strong>SwiftUI View</strong> 的載具，本身 <strong>HelloViewController</strong> 繼承 <strong>UIKit</strong> 框架的 <strong>UIViewController</strong>，在 <strong>viewDidLoad</strong> 中，使用蘋果仙女 <strong>UIHostingController</strong> 來初始化我們設計的 <strong>HelloView</strong>，初始化完成後，再用平常 <strong>UIKit</strong> 加 <strong>subview controller</strong> 的方法，把仙女加進 <strong>HelloViewController</strong> 中。</p>
+<h2 id="STEP3-Objective-C-登場"><a href="#STEP3-Objective-C-登場" class="headerlink" title="STEP3 Objective-C 登場"></a>STEP3 Objective-C 登場</h2><p>要讓 OC 使用 Swift 撰寫的 code 很簡單，只要在 OC 的 <strong>.m</strong> 中，<strong>import</strong> 以下兩個 <strong>.h</strong> 即可：</p>
+<pre><code class="highlight clean">#<span class="keyword">import</span> <span class="string">&quot;WelcomeSwiftUI-Bridging-Header.h&quot;</span>
+#<span class="keyword">import</span> <span class="string">&quot;WelcomeSwiftUI-Swift.h&quot;</span></code></pre>
+
+
+<p>第一個 <strong>.h</strong> 就是在步驟一 <strong>Xcode</strong> 生成的 <strong>Bridging Header</strong> 檔，而第二個 <strong>.h</strong> 則是 <strong>Swift</strong> 會自動生成的標頭檔，目的是給 OC 看的，讓 OC 可以藉此呼叫 <strong>Swift</strong> 寫的函式 (function)</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/swift/importing-swift-into-objective-c">Importing Swift into Objective-C | Apple Developer Documentation</a></p>
+<h2 id="STEP4-在-Objective-C-裡使用-Swift"><a href="#STEP4-在-Objective-C-裡使用-Swift" class="headerlink" title="STEP4 在 Objective-C 裡使用 Swift"></a>STEP4 在 Objective-C 裡使用 Swift</h2><p>終於可以在 OC 的 view 中貼上 SwiftUI view 了，如範例在 <strong>OC storyboard</strong> 中的 <strong>view container</strong>，直接就可以設定成 swift 寫的 <strong>HelloViewController</strong></p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/meetTogether/07_container_view.webp" alt="07_container_view"></p>
+<p>執行結果：<strong>view controller</strong> 的上半部是用 <strong>OC ( UIKit )</strong> ，下半部是 <strong>Swift ( SwiftUI )</strong> 。酷 😎</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/meetTogether/08_simulator_result.webp" alt="08_simulator_result"></p>
+<p>參考專案：<a target="_blank" rel="noopener" href="https://github.com/theLittleApps/demos.git">theLittleApps&#x2F;demos: use for demos</a></p>
+<h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><p>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://medium.com/@kusalprabathrajapaksha/integrating-swiftui-into-objective-c-projects-two-effective-approaches-daa250fe195c">Integrating SwiftUI into Objective-C Projects: Two Effective Approaches</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=B5-1_aR20rE">How to Use Child ViewControllers (Container Views) in Swift - Programmatic &amp; Storyboard</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/swiftui/uihostingcontroller?source=post_page-----4eda5147e55a--------------------------------&utm_source=pocket_saves">UIHostingController | Apple Developer Documentation</a></p>
+<h3 id="贊助我們"><a href="#贊助我們" class="headerlink" title="贊助我們"></a>贊助我們</h3><p><a href="https://www.buymeacoffee.com/thelittleapps" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a></p>
+</main>
+</article>
+<div>
+  <section id="comments" class="comments">
+    <style>
+      .utterances{max-width: 100%;}
+    </style>
+    <script src="https://utteranc.es/client.js"
+      repo="theLittleApps/theLittleApps.github.io"
+      issue-term="url"
+      theme="preferred-color-scheme"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+</div>
+
+<script src="/js/highlight.js"></script>
+
+  </main>
+  <footer class="footer">
+  
+  <span>Copyright © 2024 The Little Apps</span>
+  
+</footer>
+  
+<script src="/js/theme.js"></script>
+
+</body>
+
+</html>
