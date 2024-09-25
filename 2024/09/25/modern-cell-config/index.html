@@ -67,7 +67,7 @@
 <p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/moderncellconfiguration/01_class_struct.webp" alt="01_class_struct"></p>
 <h1 id="Classic-Cell-Configuration"><a href="#Classic-Cell-Configuration" class="headerlink" title="Classic Cell Configuration"></a>Classic Cell Configuration</h1><p>實務上 APP 常使用到列表頁 (<strong>UITableView</strong>) 的 UI，如果要用 <strong>UIKit</strong> 來純寫 code 來實作的話，通常會先在 <strong>UIViewController</strong> 上 create <strong>UITableView</strong>，在這 table view 上註冊我們寫 code 客製化自訂的 <strong>cell</strong> ( <strong>繼承 UITableViewCell</strong> ) 如</p>
 <pre><code class="highlight php"><span class="comment">// register cells</span>
-        tableView.<span class="title function_ invoke__">register</span>(NewsCell.<span class="built_in">self</span>, <span class="attr">forCellReuseIdentifier</span>: NewsCell.identifier)</code></pre>
+tableView.<span class="title function_ invoke__">register</span>(NewsCell.<span class="built_in">self</span>, <span class="attr">forCellReuseIdentifier</span>: NewsCell.identifier)</code></pre>
 
 
 <p>然後在 table view 的 <strong>data source</strong> 中，create cell ，並設定重複使用這 cell ，然後把資料 ( model ) 傳入 cell 後，回傳。</p>
