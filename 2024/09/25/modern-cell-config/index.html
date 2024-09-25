@@ -272,14 +272,14 @@ extension UITableViewCell &#123;
 // when cell is selected, this update would be called
 override func updateConfiguration(using <span class="keyword">state</span>: UICellConfigurationState) &#123;
 
-	super.updateConfiguration(using: <span class="keyword">state</span>)
-        
+	super.updateConfiguration(using: <span class="keyword">state</span>)  
     // generate configuration <span class="keyword">for</span> cell content based <span class="keyword">on</span> cell&#x27;s <span class="keyword">state</span>
     let contentConfig = NewsContentConfiguration_US(news: a_news).updated(<span class="keyword">for</span>: <span class="keyword">state</span>)
     contentConfiguration = contentConfig        
 &#125;
 
 func <span class="built_in">set</span>(news: News) &#123;
+
      contentConfiguration = NewsContentConfiguration_US(news: news)
      a_news = news
 &#125;
@@ -299,11 +299,10 @@ func <span class="built_in">set</span>(news: News) &#123;
 &#125;
 
 <span class="keyword">private</span> <span class="keyword">func</span> <span class="title function_">setStyle</span>() &#123;
-    
+
 	<span class="keyword">guard</span> <span class="keyword">let</span> config <span class="operator">=</span> configuration <span class="keyword">as?</span> <span class="type">NewsContentConfiguration_US</span> <span class="keyword">else</span> &#123;
 		<span class="keyword">return</span>
     &#125;
-	
     newsTitleLabel.textColor <span class="operator">=</span> config.textColor
     newsSourceLabel.textColor <span class="operator">=</span> config.textColor    
 &#125;</code></pre>
