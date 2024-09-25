@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <title>
+    
+    Apple 的小心思：Modern Cell Configuration 丨
+    
+
+    thelittleapps
+  </title>
+
+  
+  <link rel="shortcut icon" href="/logo.svg">
+  
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  
+  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.css">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+  
+
+  <!-- 字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+  
+<link rel="stylesheet" href="/css/root.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/css/post.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <header class="header">
+  <section class="header-container">
+    <a class="logo" href="/">The Little Apps</a>
+    <ul class="nav">
+      
+      <li><a href="/archives">blogs</a></li>
+      
+      <li><a href="/about">about</a></li>
+      
+    </ul>
+  </section>
+</header>
+  <main class="main">
+    <article class="post">
+  
+  <div class="post-title">Apple 的小心思：Modern Cell Configuration</div>
+  <div class="post-meta">
+    <div class="date">2024 September 25th</div>
+    <div class="tags">
+      
+    </div>
+  </div>
+  
+
+  <main class="post-content"><p>大叔剛入行時，還是 iPhone 4s 的時代，那時後手機上的硬體資源有限，記憶體還很珍貴，有這麼多 APP 要一起共享，所以在寫 APP 的時候，記憶體的使用就需要特別的注意，不管是要 <strong>alloc</strong> ( 記憶體配置 ) 變數或是 <strong>free</strong> ( 記憶體釋放 ) 都要小心，一不留意 APP 就會跟大叔閃退 say goodbye。經典的<strong>UIKit</strong> 框架就誕生在這樣的背景中，在 <strong>UIKit</strong> 中主力是使用 <strong>class</strong> ( 類別 ) 的型別，它是一種 <strong>reference type</strong> ，而來到了 iPhone 16 ( iOS 18 ) 的時代，有了 <strong>AI</strong> 的剛需，iPhone 記憶體 ( RAM ) 來到了傳聞中的 <strong>8G</strong>，現在的 <strong>SwiftUI</strong>，就由 <strong>class</strong> 改變成 <strong>struct</strong> ( 結構 )，struct 是一種 <strong>value type</strong> 的型別。那蘋果為何從 <strong>class</strong> 轉性成 <strong>struct</strong>？從<strong>指標</strong>指來指去的 <strong>refernce type</strong> 轉成，每次使都要 <strong>clone</strong> 或 <strong>create</strong> 的 <strong>value type</strong> ？全是為了兩個字：<strong>安全</strong>。至於 <strong>struct</strong> 怎麼來個安全法，這又是另一篇故事了😎</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/moderncellconfiguration/01_class_struct.webp" alt="01_class_struct"></p>
+<h1 id="Classic-Cell-Configuration"><a href="#Classic-Cell-Configuration" class="headerlink" title="Classic Cell Configuration"></a>Classic Cell Configuration</h1><p>實務上 APP 常使用到列表頁 (<strong>UITableView</strong>) 的 UI，如果要用 <strong>UIKit</strong> 來純寫 code 來實作的話，通常會先在 <strong>UIViewController</strong> 上 create <strong>UITableView</strong>，在這 table view 上註冊我們寫 code 客製化自訂的 <strong>cell</strong> ( <strong>繼承 UITableViewCell</strong> ) 如</p>
+<pre><code class="highlight php"><span class="comment">// register cells</span>
+        tableView.<span class="title function_ invoke__">register</span>(NewsCell.<span class="built_in">self</span>, <span class="attr">forCellReuseIdentifier</span>: NewsCell.identifier)</code></pre>
+
+
+<p>然後在 table view 的 <strong>data source</strong> 中，create cell ，並設定重複使用這 cell ，然後把資料 ( model ) 傳入 cell 後，回傳。</p>
+<pre><code class="highlight swift"><span class="keyword">func</span> <span class="title function_">tableView</span>(<span class="keyword">_</span> <span class="params">tableView</span>: <span class="type">UITableView</span>, <span class="params">cellForRowAt</span> <span class="params">indexPath</span>: <span class="type">IndexPath</span>) -&gt; <span class="type">UITableViewCell</span> &#123;
+	<span class="comment">// classic cell for custom cell in programming</span>
+    <span class="keyword">let</span> cell <span class="operator">=</span> tableView.dequeueReusableCell(withIdentifier: <span class="type">NewsCell</span>.identifier, for: indexPath) <span class="keyword">as!</span> <span class="type">NewsCell</span>
+    <span class="keyword">let</span> a_news <span class="operator">=</span> news[indexPath.row]
+    cell.set(news: a_news)
+        
+    <span class="keyword">return</span> cell    
+&#125;</code></pre>
+
+
+<p>而我們這客製化的 cell，data type 為 <strong>class</strong> ，所以它可以繼承 <strong>UITableViewCell</strong> 這蘋果先幫我們寫好的 cell。</p>
+<pre><code class="highlight swift"><span class="keyword">import</span> UIKit
+
+<span class="keyword">class</span> <span class="title class_">NewsCell</span>: <span class="title class_ inherited__">UITableViewCell</span> &#123;
+	<span class="keyword">static</span> <span class="keyword">let</span> identifier <span class="operator">=</span> <span class="string">&quot;NewsCell&quot;</span>
+
+    <span class="keyword">var</span> newsImageView <span class="operator">=</span> <span class="type">UIImageView</span>()
+    <span class="keyword">var</span> newsTitleLabel <span class="operator">=</span> <span class="type">UILabel</span>()
+    <span class="keyword">var</span> newsSourceLabel <span class="operator">=</span> <span class="type">UILabel</span>()
+    
+    <span class="keyword">override</span> <span class="keyword">init</span>(<span class="params">style</span>: <span class="type">UITableViewCell</span>.<span class="type">CellStyle</span>, <span class="params">reuseIdentifier</span>: <span class="type">String</span>?) &#123;
+        <span class="keyword">super</span>.<span class="keyword">init</span>(style: style, reuseIdentifier: reuseIdentifier)
+        layoutViews()
+    &#125;
+    
+    <span class="keyword">required</span> <span class="keyword">init?</span>(<span class="params">coder</span>: <span class="type">NSCoder</span>) &#123;
+        <span class="built_in">fatalError</span>(<span class="string">&quot;init(coder:) has not been implemented&quot;</span>)
+    &#125;
+    
+    <span class="keyword">func</span> <span class="title function_">set</span>(<span class="params">news</span>: <span class="type">News</span>) &#123;
+        newsImageView.image <span class="operator">=</span> news.image
+        newsTitleLabel.text <span class="operator">=</span> news.title
+        newsSourceLabel.text <span class="operator">=</span> news.source
+    &#125;
+	
+	<span class="operator">...</span>
+&#125;</code></pre>
+
+
+<p>完整程式：<a target="_blank" rel="noopener" href="https://github.com/theLittleApps/ModernCellConfigurationExample/blob/main/ModernCellConfigurationExe/ClassicCellConfig/NewsCell.swift">ModernCellConfigurationExe&#x2F;ClassicCellConfig&#x2F;NewsCell.swift</a></p>
+<p>由以上的範例，看到傳入 cell 的資料，直接設定在 cell 的 UI 元件 ( <strong>UIImageView &amp; UILabel</strong> ) 上，這套經典的寫法大叔把它稱作「<strong>Classic Cell Configuration</strong> 」，十多年來這 <strong>Table View Cell</strong> 的經典設計款，蘋果大概是很難將它下架吧！但時代在變 寫 APP 的方法也在變，在 <a target="_blank" rel="noopener" href="https://www.apple.com/tw/newsroom/2020/06/wwdc20-highlights/">WWDC 2020</a> 時，我們蘋果教主提出了一套「<strong>Modern Cell Configuration</strong>」的新設計，作為 <strong>Table View Cell</strong> 的新時代之作，想必蘋果圖的心思是想讓 <strong>UIKit</strong> 繼續存活個好幾年吧，但教主心思豈止於此，待大叔娓娓道來😎</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/wwdc20/10027">Modern cell configuration - WWDC20 - Videos - Apple Developer</a></p>
+<h1 id="Modern-Cell-Configuration"><a href="#Modern-Cell-Configuration" class="headerlink" title="Modern Cell Configuration"></a>Modern Cell Configuration</h1><h2 id="STEP1"><a href="#STEP1" class="headerlink" title="STEP1"></a>STEP1</h2><p>先 create 另一個新的 cell 如</p>
+<pre><code class="highlight perl">import UIKit
+
+<span class="class"><span class="keyword">class</span> <span class="title">NewsCell_MCC</span>: <span class="title">UITableViewCell</span> </span>&#123;
+	static let identifier = <span class="string">&quot;NewsCell_MCC&quot;</span>
+&#125;</code></pre>
+
+
+
+
+<h2 id="STEP2"><a href="#STEP2" class="headerlink" title="STEP2"></a>STEP2</h2><p>下一步 create 一新的 <strong>struct</strong>，如取名為 NewsContentConfiguration，其中這 <strong>struct</strong> 需遵從  <code>UIContentConfiguration</code> 這 <strong>protocol</strong> ( 協定 )，<strong>Swift</strong> 規定 <strong>struct</strong> 無法繼承只能遵從協定 ( <strong>protocol</strong> ) 如</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/moderncellconfiguration/03_content_configuration.webp" alt="03_content_configuration"></p>
+<p><strong>UIContentConfiguration</strong> 協定，必需要實作兩個 <strong>Instance Methods</strong></p>
+<pre><code class="highlight swift"><span class="keyword">import</span> UIKit
+
+<span class="keyword">struct</span> <span class="title class_">NewsContentConfiguration</span>: <span class="title class_ inherited__">UIContentConfiguration</span> &#123;
+	<span class="keyword">func</span> <span class="title function_">makeContentView</span>() -&gt; <span class="keyword">any</span> <span class="type">UIView</span> &amp; <span class="type">UIContentView</span> &#123;
+    &#125;
+    
+    <span class="comment">// update different style based on cell&#x27;s state</span>
+    <span class="keyword">func</span> <span class="title function_">updated</span>(<span class="params">for</span> <span class="params">state</span>: <span class="keyword">any</span> <span class="type">UIConfigurationState</span>) -&gt; <span class="type">NewsContentConfiguration</span> &#123;
+    &#125;
+&#125;</code></pre>
+
+<h3 id="makeConentView"><a href="#makeConentView" class="headerlink" title="makeConentView()"></a><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/uicontentconfiguration/3600982-makecontentview">makeConentView()</a></h3><p>可以產生 table view cell 的畫面 ( <strong>content view</strong> )，用在 <strong>Content Configuration</strong> 中</p>
+<h3 id="updated-for"><a href="#updated-for" class="headerlink" title="updated(for:)"></a><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/uicontentconfiguration/3600983-updated">updated(for:)</a></h3><p> 在這 method 中可以先預設好 <strong>cell 的各個狀態 ( state )</strong> 要顯示的 UI 或資料 ，之後再依傳入<strong>狀態</strong> (<strong>UIConfigurationState</strong>)，回傳 <strong>Content Configuration</strong> </p>
+<h2 id="STEP3"><a href="#STEP3" class="headerlink" title="STEP3"></a>STEP3</h2><p>再來產生一 <strong>ContentView</strong>，即<strong>NewsContentConfiguration</strong> 中 <strong>makeContentView()</strong> 需回傳的。如</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/moderncellconfiguration/04_content_view.webp" alt="04_content_view"></p>
+<p>這 <strong>NewsContentView</strong> 為 <strong>class</strong>，除了繼承 了 <strong>UIView</strong> 外 ，還需要遵從 <strong><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/uicontentview">UIContentView</a></strong> 協定</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/moderncellconfiguration/05_uicontentview.webp" alt="05_uicontentview"></p>
+<p><strong>UIContentView</strong>，需要宣告參數 <code>var configuration: any UIContentConfiguration</code>，目的是用來傳入 <strong>STEP2</strong> 中的 <strong>configuration</strong></p>
+<pre><code class="highlight swift"><span class="keyword">import</span> UIKit
+
+<span class="keyword">class</span> <span class="title class_">NewsContentView</span>: <span class="title class_ inherited__">UIView</span>, <span class="title class_ inherited__">UIContentView</span> &#123;
+    <span class="keyword">var</span> configuration: <span class="keyword">any</span> <span class="type">UIContentConfiguration</span>
+    
+    <span class="keyword">init</span>(<span class="params">configuration</span>: <span class="keyword">any</span> <span class="type">UIContentConfiguration</span>) &#123;
+        <span class="keyword">self</span>.configuration <span class="operator">=</span> configuration
+        <span class="keyword">super</span>.<span class="keyword">init</span>(frame: .zero)
+    &#125;
+    
+    <span class="keyword">required</span> <span class="keyword">init?</span>(<span class="params">coder</span>: <span class="type">NSCoder</span>) &#123;
+        <span class="built_in">fatalError</span>(<span class="string">&quot;init(coder:) has not been implemented&quot;</span>)
+    &#125;
+&#125;</code></pre>
+
+
+
+
+
+<h2 id="STEP4"><a href="#STEP4" class="headerlink" title="STEP4"></a>STEP4</h2><p>參考範例程式把 <strong><a target="_blank" rel="noopener" href="https://github.com/theLittleApps/ModernCellConfigurationExample/blob/main/ModernCellConfigurationExe/ModernCellConfig/NewsContentConfiguration.swift">NewsContentConfiguration</a></strong> 與 <strong><a target="_blank" rel="noopener" href="https://github.com/theLittleApps/ModernCellConfigurationExample/blob/main/ModernCellConfigurationExe/ModernCellConfig/NewsContentView.swift">NewsContentView</a></strong> 剩下的部分補上</p>
+<h2 id="Explanation"><a href="#Explanation" class="headerlink" title="Explanation"></a>Explanation</h2><h3 id="NewsContentConfiguration"><a href="#NewsContentConfiguration" class="headerlink" title="NewsContentConfiguration"></a>NewsContentConfiguration</h3><pre><code class="highlight swift"><span class="keyword">struct</span> <span class="title class_">NewsContentConfiguration</span>: <span class="title class_ inherited__">UIContentConfiguration</span> &#123;
+    <span class="comment">// data</span>
+    <span class="keyword">let</span> news: <span class="type">News</span>
+    
+    <span class="keyword">func</span> <span class="title function_">makeContentView</span>() -&gt; <span class="keyword">any</span> <span class="type">UIView</span> &amp; <span class="type">UIContentView</span> &#123;
+        <span class="keyword">return</span> <span class="type">NewsContentView</span>(configuration: <span class="keyword">self</span>)
+    &#125;
+    
+    <span class="comment">// update different style based on cell&#x27;s state</span>
+    <span class="keyword">func</span> <span class="title function_">updated</span>(<span class="params">for</span> <span class="params">state</span>: <span class="keyword">any</span> <span class="type">UIConfigurationState</span>) -&gt; <span class="type">NewsContentConfiguration</span> &#123;
+        <span class="keyword">return</span> <span class="keyword">self</span>
+    &#125;
+&#125;</code></pre>
+
+<p>如上，先宣告要顯示的資料 ( <strong>News Model</strong> ) ，而 <strong>makeContentView</strong> 中則回傳 <strong>SETP3</strong> 中的 <strong>content view</strong> ，並同時也把自己 <strong>self</strong> ( <strong>NewsContentConfiguration</strong> )，傳入 <strong>content view</strong> 裡，至於 <strong>update(for:)</strong> 暫時先回傳自己 ( <strong>self</strong> )。</p>
+<h3 id="NewsContentView"><a href="#NewsContentView" class="headerlink" title="NewsContentView"></a>NewsContentView</h3><p>在 <strong>Classic Cell Configuration</strong> 中，我們會直接在 <strong>table view cell</strong> 中設定 UI ( <strong>UIImageView &amp; UILabel</strong> ) 的 <strong>layout</strong> 和其值，如</p>
+<pre><code class="highlight stylus">func <span class="built_in">set</span>(news: News) &#123;
+	 newsImageView<span class="selector-class">.image</span> = news<span class="selector-class">.image</span>
+     newsTitleLabel<span class="selector-class">.text</span> = news<span class="selector-class">.title</span>
+     newsSourceLabel<span class="selector-class">.text</span> = news<span class="selector-class">.source</span>
+&#125;</code></pre>
+
+<p>但在 <strong>Modern Cell Configuration</strong> 中，我們可以把原本 cell 中的設定，盡數搬到 <strong>content view</strong> 中，如</p>
+<pre><code class="highlight scss">private func <span class="built_in">layoutViews</span>() &#123;
+	<span class="built_in">addSubviews</span>()
+    <span class="built_in">configureSubViews</span>()
+    <span class="built_in">setConstraints</span>()    
+&#125;</code></pre>
+
+<p>而設定 UI 資料，則需透過 <strong>content configuration</strong> 參數傳入，如</p>
+<pre><code class="highlight arduino"><span class="function"><span class="keyword">private</span> func <span class="title">setNews</span><span class="params">()</span> </span>&#123;
+	guard let config = configuration as? NewsContentConfiguration <span class="keyword">else</span> &#123;
+		<span class="keyword">return</span>
+	&#125;
+	newsImageView.image = config.news.image
+    newsTitleLabel.text = config.news.title
+    newsSourceLabel.text = config.news.source   
+&#125;</code></pre>
+
+<p>這傳入的 <strong>content configuration</strong> 是不是很像 <strong>MVVM</strong> 開發中的 <strong>View Model</strong>，這個 <strong>configuration</strong> 是 <strong>struct</strong>，對 iOS 來說是 <strong>struct</strong> 非常輕量，殺掉後再次產生，也不會有什麼負擔， <strong>struct</strong> 是蘋果的新歡，使用 <strong>configuration</strong> 可以把 <strong>UI</strong> 與 <strong>data</strong> 區分開來，同樣的 <strong>configuration</strong> 就可使用在不同的 <strong>content view</strong> 上。</p>
+<h3 id="NewsCell-MCC"><a href="#NewsCell-MCC" class="headerlink" title="NewsCell_MCC"></a>NewsCell_MCC</h3><p>經過 <strong>Modern Cell Configuration</strong> 的巧手協助， <strong>table view cell</strong> 可以簡化成：</p>
+<pre><code class="highlight swift"><span class="keyword">import</span> UIKit
+
+<span class="keyword">class</span> <span class="title class_">NewsCell_MCC</span>: <span class="title class_ inherited__">UITableViewCell</span> &#123;
+    <span class="keyword">static</span> <span class="keyword">let</span> identifier <span class="operator">=</span> <span class="string">&quot;NewsCell_MCC&quot;</span>
+
+    <span class="keyword">func</span> <span class="title function_">set</span>(<span class="params">news</span>: <span class="type">News</span>) &#123;
+        contentConfiguration <span class="operator">=</span> <span class="type">NewsContentConfiguration</span>(news: news)
+    &#125;
+&#125;</code></pre>
+
+<p>每次呼叫 cell 的 <strong>set(news:)</strong> 時，可以產生新的 <strong>NewsContentConfiguration</strong>，並把它設定為 <strong>cell</strong> 的 <strong>contentConfiguration</strong> ，它是 <strong>iOS 14</strong> 之後蘋果為 <strong>table view cell</strong> 新加入的屬性，它的資料型態就是 <strong>UIContentConfiguration</strong></p>
+<pre><code class="highlight less"><span class="variable">@available</span>(iOS <span class="number">14.0</span>, tvOS <span class="number">14.0</span>, *)
+extension UITableViewCell &#123;
+
+    <span class="variable">@available</span>(iOS <span class="number">14.0</span>, tvOS <span class="number">14.0</span>, *)
+    <span class="variable">@MainActor</span> <span class="variable">@preconcurrency</span> public var <span class="attribute">contentConfiguration</span>: (any UIContentConfiguration)?
+
+    <span class="variable">@available</span>(iOS <span class="number">14.0</span>, tvOS <span class="number">14.0</span>, *)
+    <span class="variable">@MainActor</span> <span class="variable">@preconcurrency</span> public func <span class="built_in">defaultContentConfiguration</span>() -&gt; UIListContentConfiguration
+&#125;</code></pre>
+
+<p>這時候可以執行程式了，跑起來結果應該和 <strong>classic cell configuration</strong> 相同。</p>
+<h1 id="Update-Configuration-State"><a href="#Update-Configuration-State" class="headerlink" title="Update Configuration State"></a>Update Configuration State</h1><p>原本用傳統的 <strong>classic cell configuration</strong> 的方式，要達成手指選到哪個 cell ，這 cell 就要能變換顏色，可能需要去宣告 <strong>table view delegate</strong> 的方法，去攔截接收手指 touch 到 cell 的 event 來變換顏色，整個感覺相當的麻煩與囉唆。</p>
+<p>但如果用 <strong>modern cell configuration</strong> 來實作的話，可能會變得簡單一點。神奇的地方就發生在 <strong>configuration</strong> 中的 <strong>update(for:)</strong> 這 method，修改 <strong>content configuration</strong> 如</p>
+<pre><code class="highlight swift"><span class="keyword">struct</span> <span class="title class_">NewsContentConfiguration_US</span>: <span class="title class_ inherited__">UIContentConfiguration</span> &#123;
+    <span class="comment">// data</span>
+    <span class="keyword">let</span> news: <span class="type">News</span>
+    <span class="comment">// ui style</span>
+    <span class="keyword">var</span> textColor: <span class="type">UIColor</span>?
+    
+    <span class="keyword">func</span> <span class="title function_">makeContentView</span>() -&gt; <span class="keyword">any</span> <span class="type">UIView</span> &amp; <span class="type">UIContentView</span> &#123;
+        <span class="keyword">return</span> <span class="type">NewsContentView_US</span>(configuration: <span class="keyword">self</span>)
+    &#125;
+    
+    <span class="keyword">func</span> <span class="title function_">updated</span>(<span class="params">for</span> <span class="params">state</span>: <span class="keyword">any</span> <span class="type">UIConfigurationState</span>) -&gt; <span class="type">NewsContentConfiguration_US</span> &#123;
+        <span class="keyword">guard</span> <span class="keyword">let</span> state <span class="operator">=</span> state <span class="keyword">as?</span> <span class="type">UICellConfigurationState</span> <span class="keyword">else</span> &#123;
+            <span class="keyword">return</span> <span class="keyword">self</span>
+        &#125;
+        
+        <span class="keyword">var</span> updatedConfig <span class="operator">=</span> <span class="keyword">self</span>
+        <span class="comment">// when cell is selected, text color would turn to white</span>
+        <span class="keyword">if</span> state.isSelected &#123;
+            updatedConfig.textColor <span class="operator">=</span> .systemRed
+        &#125;<span class="keyword">else</span> &#123;
+            updatedConfig.textColor <span class="operator">=</span> .black
+        &#125;
+        
+        <span class="keyword">return</span> updatedConfig
+    &#125;
+&#125;
+</code></pre>
+
+
+
+<p>在 <strong>updated(for:)</strong> 中依傳入的 <strong>UIConfigurationState</strong> 來設定 cell 標題文字的顏色。先宣告 <strong>var textColor: UIColor?</strong> 成員變數，當 cell 被選 ( <strong>isSelected</strong> ) 到時 <strong>textColor</strong> 為紅色，而沒被選到則為黑色，而回傳值仍然是 <strong>return</strong> 自己 ( self )，只不過這個自己會根據 cell 不同的狀態 ( state ) 來改變 <strong>textColor</strong>。</p>
+<p>而在 <strong>table view cell</strong>，則新增這幾行</p>
+<pre><code class="highlight pf">private var a_news = News(image: nil, title: nil, source: nil)
+
+// when cell is selected, this update would be called
+override func updateConfiguration(using <span class="keyword">state</span>: UICellConfigurationState) &#123;
+	super.updateConfiguration(using: <span class="keyword">state</span>)
+        
+    // generate configuration <span class="keyword">for</span> cell content based <span class="keyword">on</span> cell&#x27;s <span class="keyword">state</span>
+    let contentConfig = NewsContentConfiguration_US(news: a_news).updated(<span class="keyword">for</span>: <span class="keyword">state</span>)
+    contentConfiguration = contentConfig        
+&#125;
+
+func <span class="built_in">set</span>(news: News) &#123;
+     contentConfiguration = NewsContentConfiguration_US(news: news)
+     a_news = news
+&#125;
+</code></pre>
+
+
+
+
+<p>新增 <code>private var a_news</code> 來儲存 <strong>set(news:)</strong> 時傳入的 <strong>news</strong>。</p>
+<p>另外新增<strong>覆寫</strong> ( <strong>override</strong> ) **<a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/uitableviewcell/3601059-updateconfiguration">updateConfiguration(using:)**</a> 這 function，當每次 <strong>tableview cell</strong> 狀態 ( <strong>UICellConfigurationState</strong> ) 有改變時，系統會自動呼叫此 function，因此可以在 update 裡改變我們設計的 <strong>content configuration</strong>( 例如 <strong>NewsContentConfiguration_US</strong> ) ，並把 <strong>cell 狀態</strong>傳入。當回傳時就可以直接再次設定到 cell 的 <strong>contentConfiguration</strong>，因為 <strong>configuration</strong> 是 <strong>struct</strong>，所以 iOS 不怕我們一直產生一直設定。</p>
+<p>最後 <strong>Content View</strong> 需修改如下，用以改變文字顏色</p>
+<pre><code class="highlight swift"><span class="keyword">var</span> configuration: <span class="keyword">any</span> <span class="type">UIContentConfiguration</span> &#123;
+	<span class="keyword">didSet</span> &#123;
+		setStyle()
+    &#125;    
+&#125;
+
+<span class="keyword">private</span> <span class="keyword">func</span> <span class="title function_">setStyle</span>() &#123;
+	<span class="keyword">guard</span> <span class="keyword">let</span> config <span class="operator">=</span> configuration <span class="keyword">as?</span> <span class="type">NewsContentConfiguration_US</span> <span class="keyword">else</span> &#123;
+		<span class="keyword">return</span>
+    &#125;
+	
+	newsTitleLabel.textColor <span class="operator">=</span> config.textColor
+    newsSourceLabel.textColor <span class="operator">=</span> config.textColor    
+&#125;</code></pre>
+
+
+
+<p>在原本的 <strong>configuration</strong> 裡新增 <strong>didSet</strong> 的呼叫，當傳入的 <strong>configuration</strong> 一有變動之後，就會去呼叫 <strong>didSet</strong> 裡的 <strong>setStyle</strong> ，用來設定 <strong>UILabel</strong> 的 <strong>textColor</strong>。</p>
+<p>行文到這，不知道有沒有人有疑問？用傳統寫 code 的方式來產生 <strong>table view cell</strong> 就已經夠囉唆了，為何在 <strong>iOS 14</strong> 蘋果要引進這看似囉唆複雜的 <strong>Modern Cell Configuration</strong> ，既要新增 <strong>content configuration</strong> 又要新增 <strong>content view</strong>？答案揭曉：原來這一切都是為了 <strong>SwiftUI</strong> 在鋪路啊！<strong>table view cell</strong> 有了 <strong>content configuration</strong> 的設計，就可以透過 **<a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/SwiftUI/UIHostingConfiguration">UIHostingConfiguration(content:)</a>**的引薦，直接引入 <strong>SwiftUI</strong> 所撰寫的 view，蘋果教主的這一點小心思，豈不妙哉😎</p>
+<h4 id="參考完整程式專案-https-github-com-theLittleApps-ModernCellConfigurationExample"><a href="#參考完整程式專案-https-github-com-theLittleApps-ModernCellConfigurationExample" class="headerlink" title="參考完整程式專案 https://github.com/theLittleApps/ModernCellConfigurationExample"></a>參考完整程式專案 <a target="_blank" rel="noopener" href="https://github.com/theLittleApps/ModernCellConfigurationExample">https://github.com/theLittleApps/ModernCellConfigurationExample</a></h4><h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><p>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=8xjkFkSpl1M">Modern Cell Configuration in iOS 14 (Swift 5, Xcode 12, 2020) - iOS Development</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://apppeterpan.medium.com/%E5%BE%9E-ios-15-%E9%96%8B%E5%A7%8B-%E4%BD%BF%E7%94%A8%E5%85%A7%E5%BB%BA-cell-%E6%A8%A3%E5%BC%8F%E5%BB%BA%E8%AD%B0%E6%90%AD%E9%85%8D-uilistcontentconfiguration-13d64eb317be">從 iOS 15 開始，使用內建 cell 樣式建議搭配 UIListContentConfiguration</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://medium.com/swlh/ios-14-modern-cell-configuration-for-beginners-programmatically-2a1be3f12a90">iOS 14 — Modern Cell Configuration for Beginners (Programmatically)</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://www.biteinteractive.com/cell-content-configuration-in-ios-14/?utm_source=pocket_shared">The Developer’s Guide to Cell Content Configuration in iOS 14</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/63075418/how-to-use-ios-14-cell-content-configurations-in-general?utm_source=pocket_shared">how to use iOS 14 cell content configurations in general?</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://swiftbysundell.com/articles/rendering-swiftui-views-within-uitableview-or-uicollectionview/?utm_source=pocket_shared">Rendering SwiftUI views within UITableView or UICollectionView cells on iOS 16</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://medium.com/@dragos.rotaru9/uitableviewcell-in-ios-14-ef19e877319f">UITableViewCell in iOS 14</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/64847456/how-to-implement-a-text-field-cell-with-custom-content-configuration-in-ios-14?utm_source=pocket_shared">How to implement a text field cell with custom content configuration in iOS 14?</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://swiftsenpai.com/development/uicollectionview-list-custom-cell/?utm_source=pocket_shared">UICollectionView List with Custom Cell and Custom Configuration</a></p>
+<h3 id="贊助我們"><a href="#贊助我們" class="headerlink" title="贊助我們"></a>贊助我們</h3><p><a href="https://www.buymeacoffee.com/thelittleapps" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a></p>
+</main>
+</article>
+<div>
+  <section id="comments" class="comments">
+    <style>
+      .utterances{max-width: 100%;}
+    </style>
+    <script src="https://utteranc.es/client.js"
+      repo="theLittleApps/theLittleApps.github.io"
+      issue-term="url"
+      theme="preferred-color-scheme"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+</div>
+
+<script src="/js/highlight.js"></script>
+
+  </main>
+  <footer class="footer">
+  
+  <span>Copyright © 2024 The Little Apps</span>
+  
+</footer>
+  
+<script src="/js/theme.js"></script>
+
+</body>
+
+</html>
