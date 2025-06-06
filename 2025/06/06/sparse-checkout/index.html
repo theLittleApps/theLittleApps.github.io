@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <title>
+    
+    小孩才要全部，大叔只要精華：Git Sparse Checkout 丨
+    
+
+    thelittleapps
+  </title>
+
+  
+  <link rel="shortcut icon" href="/logo.svg">
+  
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  
+  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.css">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+  
+
+  <!-- 字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+  
+<link rel="stylesheet" href="/css/root.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/css/post.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <header class="header">
+  <section class="header-container">
+    <a class="logo" href="/">The Little Apps</a>
+    <ul class="nav">
+      
+      <li><a href="/archives">blogs</a></li>
+      
+      <li><a href="/about">about</a></li>
+      
+    </ul>
+  </section>
+</header>
+  <main class="main">
+    <article class="post">
+  
+  <div class="post-title">小孩才要全部，大叔只要精華：Git Sparse Checkout</div>
+  <div class="post-meta">
+    <div class="date">2025 June 6th</div>
+    <div class="tags">
+      
+    </div>
+  </div>
+  
+
+  <main class="post-content"><p>我們都知道 GitHub 是碼農的大秘寶，在開發出下個獨角獸 AI 殺手應用上，如何挖掘眾人的智慧實屬重要。雖然大秘寶有眾多 <strong>Repositories</strong> 當我們想參考裡頭的秘笈絕學時，一開始不免使用 <strong>git clone</strong> 指令，把整個 <strong>repository</strong> 都拷貝到自己電腦上，時間一久，修煉的武功愈多，就越恨自己電腦的硬碟越小，而且有的時候，我們只想參考其中的一部分，但卻把整個 repository 都 git 回來，想想是不是有點蠢，浪費硬碟空間，也浪費下載時間，這時候如果服用大叔這帖 <strong>Git Sparse Checkout</strong> 包您有通體舒暢的感覺。</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/sparseCheckout/sparse_checkout_cover.webp" alt="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/sparseCheckout/sparse_checkout_cover.webp"></p>
+<p>sparse 翻譯為「稀疏的」之意，<strong>Git Sparse Checkout</strong>  大意上就是只 <strong>clone</strong> <strong>repository</strong> 中我們有興趣子目錄 (subdirectory) 如以下例子例如，我們想參考 <strong>connectedhomeip</strong> 這 <strong>repository</strong> 中</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/sparseCheckout/01_github_matter.webp" alt="01_github_matter"></p>
+<p>位在 <strong>&#x2F;src&#x2F;darwin&#x2F;</strong> 子目錄下的東西</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/sparseCheckout/02_copy_subdir.webp" alt="02_copy_subdir"></p>
+<p>打開 mac 的<strong>終端機</strong> (terminal.app) ，鍵入如下</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/sparseCheckout/03_git_sparse_checkout_commands.webp" alt="03_git_sparse_checkout_commands"></p>
+<ol>
+<li>我們先建個 <strong>matter</strong> 這資料夾，然後 <code>git init</code> ，把 <strong>remote git repository</strong> 加到我們 local 的 matter 中</li>
+<li>第二步，設定我們要使用 <strong>sparse checkout</strong>，即 <code>git config core.sparsecheckout true</code></li>
+<li>第三步，把我們要 checkout 的子目錄，寫到 sparse checkout 的設定中，即 <code>echo src/darwin &gt;&gt; .git/info/sparse-checkout</code></li>
+<li>然後，就可以大膽的 <strong>git pull</strong> 把子目錄的東西抓回來了 <code>git pull origin master</code></li>
+</ol>
+<p>成果：</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/sparseCheckout/04_result_sparsecheckout.webp" alt="04_result_sparsecheckout"></p>
+<p>有了 <strong>sparse checkout</strong> ，離獨角獸之顛，好像又更邁進了一步，還不快快 donate 大叔一下。😘</p>
+<h3 id="參考"><a href="#參考" class="headerlink" title="參考"></a>參考</h3><p>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://jasonkarns.wordpress.com/2011/11/15/subdirectory-checkouts-with-git-sparse-checkout/">Subdirectory Checkouts with git sparse-checkout</a><br>&#x3D;&gt; <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/600079/how-do-i-clone-a-subdirectory-only-of-a-git-repository">https://stackoverflow.com/questions/600079/how-do-i-clone-a-subdirectory-only-of-a-git-repository</a></p>
+<h3 id="贊助我們"><a href="#贊助我們" class="headerlink" title="贊助我們"></a>贊助我們</h3><p><a href="https://www.buymeacoffee.com/thelittleapps" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a></p>
+</main>
+</article>
+<div>
+  <section id="comments" class="comments">
+    <style>
+      .utterances{max-width: 100%;}
+    </style>
+    <script src="https://utteranc.es/client.js"
+      repo="theLittleApps/theLittleApps.github.io"
+      issue-term="url"
+      theme="preferred-color-scheme"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+</div>
+
+<script src="/js/highlight.js"></script>
+
+  </main>
+  <footer class="footer">
+  
+  <span>Copyright © 2024 The Little Apps</span>
+  
+</footer>
+  
+<script src="/js/theme.js"></script>
+
+</body>
+
+</html>
