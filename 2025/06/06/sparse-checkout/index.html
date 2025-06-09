@@ -71,12 +71,10 @@
 <p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/sparseCheckout/02_copy_subdir.webp" alt="02_copy_subdir"></p>
 <p>打開 mac 的<strong>終端機</strong> (terminal.app) ，鍵入如下</p>
 <p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/sparseCheckout/03_git_sparse_checkout_commands.webp" alt="03_git_sparse_checkout_commands"></p>
-<ol>
-<li>我們先建個 <strong>matter</strong> 這資料夾，然後 <code>git init</code> ，把 <strong>remote git repository</strong> 加到我們 local 的 matter 中</li>
-<li>第二步，設定我們要使用 <strong>sparse checkout</strong>，即 <code>git config core.sparsecheckout true</code></li>
-<li>第三步，把我們要 checkout 的子目錄，寫到 sparse checkout 的設定中，即 <code>echo src/darwin &gt;&gt; .git/info/sparse-checkout</code></li>
-<li>然後，就可以大膽的 <strong>git pull</strong> 把子目錄的東西抓回來了 <code>git pull origin master</code></li>
-</ol>
+<p><strong>第一步</strong> &#x3D;&gt; 我們先建個 <strong>matter</strong> 這資料夾，然後 <code>git init</code> ，把 <strong>remote git repository</strong> 加到我們 local 的 matter 中</p>
+<p><strong>第二步</strong> &#x3D;&gt; 設定我們要使用 <strong>sparse checkout</strong>，即 <code>git config core.sparsecheckout true</code></p>
+<p><strong>第三步</strong> &#x3D;&gt; 把我們要 checkout 的子目錄，寫到 sparse checkout 的設定中，即 <code>echo src/darwin &gt;&gt; .git/info/sparse-checkout</code></p>
+<p><strong>第四步</strong> &#x3D;&gt; 然後，就可以大膽的 <strong>git pull</strong> 把子目錄的東西抓回來了 <code>git pull origin master</code></p>
 <p>成果：</p>
 <p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/sparseCheckout/04_result_sparsecheckout.webp" alt="04_result_sparsecheckout"></p>
 <p>有了 <strong>sparse checkout</strong> ，離獨角獸之顛，好像又更邁進了一步，還不快快 donate 大叔一下。😘</p>
@@ -104,7 +102,7 @@
   </main>
   <footer class="footer">
   
-  <span>Copyright © 2024 The Little Apps</span>
+  <span>Copyright © 2025 The Little Apps</span>
   
 </footer>
   
