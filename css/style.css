@@ -278,3 +278,22 @@ a {
   border-bottom: 2px solid var(--font-color);
   cursor: not-allowed;
 }
+
+/* Custom two-column layout for posts */
+.two-col {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+/* Columns split equally */
+.two-col > div {
+  flex: 1 1 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .two-col {
+    flex-direction: column;
+  }
+}
