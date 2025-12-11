@@ -103,19 +103,19 @@
 </tbody></table>
 <hr>
 <h2 id="Approach-1-KeyPath-Syntax-for-Value-Type"><a href="#Approach-1-KeyPath-Syntax-for-Value-Type" class="headerlink" title="Approach 1: KeyPath Syntax for Value Type"></a>Approach 1: KeyPath Syntax for Value Type</h2><p>Use this approach for simple configuration values stored in <code>EnvironmentValues</code>.</p>
-<h3 id="STEP-1-Defining-Custom-Environment-Values"><a href="#STEP-1-Defining-Custom-Environment-Values" class="headerlink" title="STEP 1: Defining Custom Environment Values"></a>STEP 1: Defining Custom Environment Values</h3><p>With iOS 18’s <code>@Entry</code> macro, this is remarkably concise:</p>
+<h3 id="Defining-Custom-Environment-Values"><a href="#Defining-Custom-Environment-Values" class="headerlink" title="Defining Custom Environment Values"></a>Defining Custom Environment Values</h3><p>With iOS 18’s <code>@Entry</code> macro, this is remarkably concise:</p>
 <pre><code class="highlight swift"><span class="keyword">extension</span> <span class="title class_">EnvironmentValues</span> &#123;
     <span class="meta">@Entry</span> <span class="keyword">var</span> appAccentColor: <span class="type">Color</span> <span class="operator">=</span> .blue
     <span class="meta">@Entry</span> <span class="keyword">var</span> cardCornerRadius: <span class="type">CGFloat</span> <span class="operator">=</span> <span class="number">12</span>
     <span class="meta">@Entry</span> <span class="keyword">var</span> isDebugMode: <span class="type">Bool</span> <span class="operator">=</span> <span class="literal">false</span>
 &#125;</code></pre>
 
-<h3 id="STEP-2-Injecting-Values"><a href="#STEP-2-Injecting-Values" class="headerlink" title="STEP 2: Injecting Values"></a>STEP 2: Injecting Values</h3><pre><code class="highlight swift"><span class="type">ContentView</span>()
+<h3 id="Injecting-Values"><a href="#Injecting-Values" class="headerlink" title="Injecting Values"></a>Injecting Values</h3><pre><code class="highlight swift"><span class="type">ContentView</span>()
     .environment(\.appAccentColor, .orange)
     .environment(\.cardCornerRadius, <span class="number">16</span>)
     .environment(\.isDebugMode, <span class="literal">true</span>)</code></pre>
 
-<h3 id="STEP-3-Reading-Values"><a href="#STEP-3-Reading-Values" class="headerlink" title="STEP 3: Reading Values"></a>STEP 3: Reading Values</h3><pre><code class="highlight swift"><span class="keyword">struct</span> <span class="title class_">ProductCard</span>: <span class="title class_ inherited__">View</span> &#123;
+<h3 id="Reading-Values"><a href="#Reading-Values" class="headerlink" title="Reading Values"></a>Reading Values</h3><pre><code class="highlight swift"><span class="keyword">struct</span> <span class="title class_">ProductCard</span>: <span class="title class_ inherited__">View</span> &#123;
     <span class="meta">@Environment</span>(\.appAccentColor) <span class="keyword">private</span> <span class="keyword">var</span> accentColor
     <span class="meta">@Environment</span>(\.cardCornerRadius) <span class="keyword">private</span> <span class="keyword">var</span> cornerRadius
     
@@ -126,15 +126,15 @@
     &#125;
 &#125;</code></pre>
 
-<h3 id="When-to-Use-KeyPath-Syntax"><a href="#When-to-Use-KeyPath-Syntax" class="headerlink" title="When to Use KeyPath Syntax"></a>When to Use KeyPath Syntax</h3><ul>
+<h3 id="When-to-Use-KeyPath-Syntax"><a href="#When-to-Use-KeyPath-Syntax" class="headerlink" title="When to Use KeyPath Syntax"></a>When to Use KeyPath Syntax</h3><ol>
 <li>App-wide theming (colors, fonts, spacing)</li>
 <li>Feature flags</li>
 <li>Configuration settings</li>
 <li>Simple value types that don’t change frequently</li>
-</ul>
+</ol>
 <hr>
 <h2 id="Approach-2-Observable-Object-Syntax-for-Reference-Type"><a href="#Approach-2-Observable-Object-Syntax-for-Reference-Type" class="headerlink" title="Approach 2: Observable Object Syntax for Reference Type"></a>Approach 2: Observable Object Syntax for Reference Type</h2><p>Use this approach for shared mutable state that needs to trigger view updates.</p>
-<h3 id="STEP-1-Creating-an-Observable-Class"><a href="#STEP-1-Creating-an-Observable-Class" class="headerlink" title="STEP 1: Creating an Observable Class"></a>STEP 1: Creating an Observable Class</h3><pre><code class="highlight swift"><span class="meta">@Observable</span>
+<h3 id="Creating-an-Observable-Class"><a href="#Creating-an-Observable-Class" class="headerlink" title="Creating an Observable Class"></a>Creating an Observable Class</h3><pre><code class="highlight swift"><span class="meta">@Observable</span>
 <span class="keyword">class</span> <span class="title class_">ShoppingCart</span> &#123;
     <span class="keyword">var</span> items: [<span class="type">CartItem</span>] <span class="operator">=</span> []
     
@@ -151,7 +151,7 @@
     &#125;
 &#125;</code></pre>
 
-<h3 id="STEP-2-Injecting-the-Object"><a href="#STEP-2-Injecting-the-Object" class="headerlink" title="STEP 2: Injecting the Object"></a>STEP 2: Injecting the Object</h3><pre><code class="highlight swift"><span class="keyword">@main</span>
+<h3 id="Injecting-the-Object"><a href="#Injecting-the-Object" class="headerlink" title="Injecting the Object"></a>Injecting the Object</h3><pre><code class="highlight swift"><span class="keyword">@main</span>
 <span class="keyword">struct</span> <span class="title class_">MyApp</span>: <span class="title class_ inherited__">App</span> &#123;
     <span class="meta">@State</span> <span class="keyword">private</span> <span class="keyword">var</span> cart <span class="operator">=</span> <span class="type">ShoppingCart</span>()
     
@@ -163,7 +163,7 @@
     &#125;
 &#125;</code></pre>
 
-<h3 id="STEP-3-Reading-the-Object"><a href="#STEP-3-Reading-the-Object" class="headerlink" title="STEP 3: Reading the Object"></a>STEP 3: Reading the Object</h3><pre><code class="highlight swift"><span class="keyword">struct</span> <span class="title class_">CartView</span>: <span class="title class_ inherited__">View</span> &#123;
+<h3 id="Reading-the-Object"><a href="#Reading-the-Object" class="headerlink" title="Reading the Object"></a>Reading the Object</h3><pre><code class="highlight swift"><span class="keyword">struct</span> <span class="title class_">CartView</span>: <span class="title class_ inherited__">View</span> &#123;
     <span class="meta">@Environment</span>(<span class="type">ShoppingCart</span>.<span class="keyword">self</span>) <span class="keyword">private</span> <span class="keyword">var</span> cart
     
     <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> &#123;
@@ -175,12 +175,12 @@
     &#125;
 &#125;</code></pre>
 
-<h3 id="When-to-Use-Observable-Syntax"><a href="#When-to-Use-Observable-Syntax" class="headerlink" title="When to Use Observable Syntax"></a>When to Use Observable Syntax</h3><ul>
+<h3 id="When-to-Use-Observable-Syntax"><a href="#When-to-Use-Observable-Syntax" class="headerlink" title="When to Use Observable Syntax"></a>When to Use Observable Syntax</h3><ol>
 <li>Shared mutable state</li>
 <li>ViewModels</li>
 <li>Services with business logic</li>
 <li>Data that changes and needs to update multiple views</li>
-</ul>
+</ol>
 <hr>
 <h2 id="Using-Both-Together"><a href="#Using-Both-Together" class="headerlink" title="Using Both Together"></a>Using Both Together</h2><p>In real apps, you’ll often use both approaches simultaneously:</p>
 <pre><code class="highlight swift"><span class="keyword">@main</span>
@@ -297,7 +297,7 @@ cart.addItem(newItem)  <span class="comment">// Modifications trigger view updat
 </tr>
 </tbody></table>
 <p>Both approaches are powerful tools in SwiftUI’s dependency injection arsenal. The KeyPath syntax excels at configuration and theming, while the Observable syntax shines for shared state management. In practice, most apps benefit from using both together.</p>
-<h2 id="Deom-in-Github"><a href="#Deom-in-Github" class="headerlink" title="Deom in Github"></a>Deom in Github</h2><p><a target="_blank" rel="noopener" href="https://github.com/theLittleApps/EnvironmentModifierDemo">https://github.com/theLittleApps/EnvironmentModifierDemo</a></p>
+<h2 id="Deom-in-Github"><a href="#Deom-in-Github" class="headerlink" title="Deom in Github"></a>Deom in Github</h2><p><a target="_blank" rel="noopener" href="https://github.com/theLittleApps/EnvironmentModifierDemo">https://github.com/theLittleApps/EnvironmentModifierDemo</a><!-- {"preview":"true"} --></p>
 <h2 id="Help-Us"><a href="#Help-Us" class="headerlink" title="Help Us"></a>Help Us</h2><p><a href="https://www.buymeacoffee.com/thelittleapps" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a></p>
 </main>
 </article>
