@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <title>
+    
+    在 EnvironmentValues 中 ，使用 @Entry 設定後，無須在 parent view 注入 ，可在 chid view 以 keyPath 的方法，直接讀取 value 來使用。請問以上的敘述正確嗎？ 丨
+    
+
+    thelittleapps
+  </title>
+
+  
+  <link rel="shortcut icon" href="/logo.svg">
+  
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  
+  <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.css">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+  
+
+  <!-- 字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+  
+<link rel="stylesheet" href="/css/root.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/css/post.css">
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <header class="header">
+  <section class="header-container">
+    <a class="logo" href="/">The Little Apps</a>
+    <ul class="nav">
+      
+      <li><a href="/archives">blogs</a></li>
+      
+      <li><a href="/apps">apps</a></li>
+      
+      <li><a href="/about">about</a></li>
+      
+    </ul>
+  </section>
+</header>
+  <main class="main">
+    <article class="post">
+  
+  <div class="post-title">在 EnvironmentValues 中 ，使用 @Entry 設定後，無須在 parent view 注入 ，可在 chid view 以 keyPath 的方法，直接讀取 value 來使用。請問以上的敘述正確嗎？</div>
+  <div class="post-meta">
+    <div class="date">2025 December 12th</div>
+    <div class="tags">
+      
+    </div>
+  </div>
+  
+
+  <main class="post-content"><p>答案是 <strong>YES!</strong></p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/environmentValueKeyPath/04_cover.webp" alt="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/environmentValueKeyPath/04_cover.webp"></p>
+<p>延續 <strong>@environment modifier</strong> 的話題，當使用 <strong>@Entry Macro</strong> 在 <strong>EnvironmentValues</strong> 中來宣告環境變數 value 時，我們無須在 app 的 parent view 端注入 (injection) 這 value 值，它存在是 Global 的，它是<strong>全域變數</strong>，在 child view 中宣告之後，就可直接拿來使用，它讀到的值，就是在 @Entry 初始化時，設定的預設值。</p>
+<pre><code class="highlight dart"><span class="keyword">import</span> Foundation
+<span class="keyword">import</span> SwiftUI
+
+<span class="comment">// Define custom environment values using @Entry</span>
+<span class="keyword">extension</span> EnvironmentValues &#123;
+    <span class="meta">@Entry</span> <span class="keyword">var</span> appAccentColor: Color = .pink                <span class="comment">// &lt;= 初始化為粉紅色</span>
+&#125;</code></pre>
+
+<p>無須在上層 parent view 注入 environment</p>
+<pre><code class="highlight scss">import SwiftUI
+
+<span class="keyword">@main</span>
+struct <span class="attribute">EnvironmentModifierDemoApp</span>: App &#123;
+    <span class="selector-tag">var</span> <span class="selector-tag">body</span>: some Scene &#123;
+        WindowGroup &#123;
+            <span class="comment">// SwiftUI&#x27;s dependency injection using environment modifier</span>
+            <span class="built_in">ContentView</span>()
+                <span class="comment">// KeyPath syntax for EnvironmentValues</span>
+<span class="comment">//                .environment(\.appAccentColor, .orange)               &lt;= 無須在 parent view 注入</span>
+        &#125;
+    &#125;
+&#125;</code></pre>
+
+<p>下層 child view，宣告後，就可以用啦！</p>
+<pre><code class="highlight less"><span class="selector-tag">import</span> <span class="selector-tag">SwiftUI</span>
+
+<span class="selector-tag">struct</span> <span class="selector-tag">ProductCard</span>: <span class="selector-tag">View</span> &#123;
+    
+    <span class="selector-tag">let</span> <span class="selector-tag">product</span>: <span class="selector-tag">Product</span>
+    
+    <span class="comment">// KeyPath syntax: simple configuration values</span>
+    @<span class="selector-tag">Environment</span>(\.appAccentColor) <span class="selector-tag">private</span> <span class="selector-tag">var</span> <span class="selector-tag">accentColor</span>              <span class="comment">// &lt;= keyPath 宣告</span>
+
+    <span class="selector-tag">var</span> <span class="selector-tag">body</span>: <span class="selector-tag">some</span> <span class="selector-tag">View</span> &#123;
+        <span class="selector-tag">VStack</span>(<span class="attribute">spacing</span>: <span class="number">8</span>) &#123;
+            <span class="selector-tag">Text</span>(product.emoji)
+                <span class="selector-class">.font</span>(.<span class="built_in">system</span>(<span class="attribute">size</span>: <span class="number">44</span>))
+            
+            <span class="selector-tag">Text</span>(product.name)
+                <span class="selector-class">.font</span>(.headline)
+            
+            <span class="selector-tag">Text</span>(<span class="string">&quot;$\(product.price, specifier: &quot;</span>%.<span class="number">2</span>f<span class="string">&quot;)&quot;</span>)
+            
+            <span class="selector-tag">Button</span> &#123;
+                <span class="selector-tag">cart</span><span class="selector-class">.addItem</span>(
+                    <span class="built_in">CartItem</span>(
+                        <span class="attribute">id</span>: product.id,
+                        <span class="attribute">name</span>: product.name,
+                        <span class="attribute">price</span>: product.price
+                    )
+                )
+            &#125; <span class="selector-tag">label</span>: &#123;
+                <span class="selector-tag">Text</span>(<span class="string">&quot;Add to Cart&quot;</span>)
+                    <span class="selector-class">.background</span>(<span class="built_in">Color</span>(accentColor))                             <span class="comment">// &lt;= 直接使用</span>
+            &#125;
+        &#125;
+    &#125;
+&#125;</code></pre>
+
+<p>結果</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/environmentValueKeyPath/01_result_01.webp" alt="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/environmentValueKeyPath/01_result_01.webp"></p>
+<p>那假設我們不要預設值，要把原本粉紅色，在 child view 中改成藍色，要怎麼做？你要知道這 accentColor 它的型別是 value type，它無法在 child view 被改寫，它是個唯獨的參數，但我們可以在 parent view 透過注入的方式，來修改設定的顏色。</p>
+<pre><code class="highlight scss">import SwiftUI
+
+<span class="keyword">@main</span>
+struct <span class="attribute">EnvironmentModifierDemoApp</span>: App &#123;    
+    <span class="selector-tag">var</span> <span class="selector-tag">body</span>: some Scene &#123;
+        WindowGroup &#123;
+            <span class="comment">// SwiftUI&#x27;s dependency injection using environment modifier</span>
+            <span class="built_in">ContentView</span>()
+                <span class="comment">// APPROACH 1: KeyPath syntax for EnvironmentValues</span>
+                <span class="selector-class">.environment</span>(\.appAccentColor, .orange)               <span class="comment">// &lt;= 使用 keyPath 的方式來 set，把它改成橘色</span>
+        &#125;
+    &#125;
+&#125;</code></pre>
+
+<p>變成橘色了</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/environmentValueKeyPath/02_result_02.webp" alt="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/environmentValueKeyPath/02_result_02.webp"></p>
+<p>所以使用 <strong>EnvironmentValues keyPath</strong> 的方式來設定環境變數，有個好處，就是它永遠都有個初始值，即使我們在開發 app 的水深火熱中，忘了注入值也沒關係，child view 不僅有值，而且還不會崩潰，<strong>超級安全</strong>。</p>
+<p>但對比 <strong>@observable</strong> 物件的寫法，它就必須要在 parent view 時注入，因為它不是全域變數，如果忘了注入或忘了初始化，在編譯時不會有錯，但在執行時 (Runtime)  app 就會崩潰，很可怕！</p>
+<p>忘了注入或忘了初始化</p>
+<pre><code class="highlight swift"><span class="keyword">import</span> SwiftUI
+
+<span class="keyword">@main</span>
+<span class="keyword">struct</span> <span class="title class_">EnvironmentModifierDemoApp</span>: <span class="title class_ inherited__">App</span> &#123;
+    
+    <span class="comment">// Observable objects are created at the app top level</span>
+<span class="comment">//    @State private var cart = ShoppingCart()</span>
+	<span class="meta">@State</span> <span class="keyword">private</span> <span class="keyword">var</span> cart: <span class="type">ShoppingCart</span>?				<span class="comment">// &lt;= 忘了初始化</span>
+    
+    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">Scene</span> &#123;
+        <span class="type">WindowGroup</span> &#123;
+            <span class="comment">// SwiftUI&#x27;s dependency injection using environment modifier</span>
+            <span class="type">ContentView</span>()
+<span class="comment">//                .environment(cart)                                            // &lt;= 忘了在 parent view 注入</span>
+        &#125;
+    &#125;
+&#125;</code></pre>
+
+<p>Crash 給你看</p>
+<p><img src="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/environmentValueKeyPath/03_crash.webp" alt="https://thelittleappsblogsbucket.s3.ap-northeast-1.amazonaws.com/environmentValueKeyPath/03_crash.webp"></p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><ol>
+<li><strong>EnvironmentValues + KeyPath</strong>：永遠有預設值，可直接讀取</li>
+<li><strong>@observable 物件</strong>：必須由 parent view 注入，否則會 crash</li>
+</ol>
+<p>所以有時候常常在程式碼中可以看到 SwiftUI 去讀取系統內建的 <strong>EnvironmentValue</strong>，完全無須初始化也不用設定，也不用注入，這個 Magic 的原因就在此。</p>
+<pre><code class="highlight less"><span class="selector-tag">import</span> <span class="selector-tag">SwiftUI</span>
+
+<span class="selector-tag">struct</span> <span class="selector-tag">MyView</span>: <span class="selector-tag">View</span> &#123;
+    <span class="variable">@Environment</span>(\.colorScheme) var colorScheme      				<span class="comment">// 預設跟隨系統</span>
+    <span class="variable">@Environment</span>(\.horizontalSizeClass) var sizeClass 				<span class="comment">// 預設根據裝置</span>
+    <span class="variable">@Environment</span>(\.locale) var locale                 				<span class="comment">// 預設跟隨系統設定</span>
+    
+    var <span class="attribute">body</span>: some View &#123;
+        <span class="comment">// 不需要任何 parent view 注入，就能使用</span>
+        <span class="selector-tag">Text</span>(<span class="string">&quot;Current scheme: \(colorScheme == .dark ? &quot;</span>Dark<span class="string">&quot; : &quot;</span>Light<span class="string">&quot;)&quot;</span>)
+    &#125;
+&#125;</code></pre>
+
+<h2 id="Demo-Project-In-Github"><a href="#Demo-Project-In-Github" class="headerlink" title="Demo Project In Github"></a>Demo Project In Github</h2><p><a target="_blank" rel="noopener" href="https://github.com/theLittleApps/EnvironmentModifierDemo">theLittleApps&#x2F;EnvironmentModifierDemo: This demo shows two ways to use .environment modifier.</a></p>
+<h2 id="贊助我們"><a href="#贊助我們" class="headerlink" title="贊助我們"></a>贊助我們</h2><p><a href="https://www.buymeacoffee.com/thelittleapps" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a></p>
+</main>
+</article>
+<div>
+  <section id="comments" class="comments">
+    <style>
+      .utterances{max-width: 100%;}
+    </style>
+    <script src="https://utteranc.es/client.js"
+      repo="theLittleApps/theLittleApps.github.io"
+      issue-term="url"
+      theme="preferred-color-scheme"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </section>
+</div>
+
+<script src="/js/highlight.js"></script>
+
+  </main>
+  <footer class="footer">
+  
+  <span>Copyright © 2025 The Little Apps</span>
+  
+</footer>
+  
+<script src="/js/theme.js"></script>
+
+</body>
+
+</html>

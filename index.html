@@ -52,6 +52,24 @@
     <div class="post-list">
   
   <section class="post-item">
+    <a class="post-item-title" href="/2025/12/12/evironment-no-injection/">在 EnvironmentValues 中 ，使用 @Entry 設定後，無須在 parent view 注入 ，可在 chid view 以 keyPath 的方法，直接讀取 value 來使用。請問以上的敘述正確嗎？</a>
+    <div class="post-item-summary">
+      答案是 YES!
+
+延續 @environment modifier 的話題，當使用 @Entry Macro 在 EnvironmentValues 中來宣告環境變數 value 時，我們無須在 app 的 parent view 端注入 (injection) 這 value 值，它存在是 Global 的，它是全域變數，在 child view 中宣告之後，就可直接拿來使用，它讀到的值，就是在 @Entry 初始化時，設定的預設值。
+import Foundation
+
+      <a class="read-more" href="/2025/12/12/evironment-no-injection/"> ... </a>
+    </div>
+    <div class="post-item-extra">
+      <div class="date">2025.12.12</div>
+      <div class="tags">
+        
+      </div>
+    </div>
+  </section>
+  
+  <section class="post-item">
     <a class="post-item-title" href="/2025/12/11/two-environment-modifiers-swiftui/">Two Ways to Use Environment Modifier in SwiftUI</a>
     <div class="post-item-summary">
       When working with SwiftUI’s dependency injection system, you’ll encounter two distinct ways to use the .environment() modifier. Understanding when to use each approach is crucial for writing clean, maintainable code.
